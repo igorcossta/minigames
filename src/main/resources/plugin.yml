@@ -1,0 +1,9 @@
+name: Minigames
+version: '0.0.0'
+main: com.github.igorcossta.Minigames
+api-version: '1.21'
+authors: [ igorcossta ]
+description: Minigames system
+website: https://github.com/igorcossta
+commands:
+  minigames:
