@@ -21,7 +21,6 @@ public class GameLaunchScheduler {
         this.mainConfig = mainConfig;
     }
 
-    // TODO: safe ignore minigames that start at same time: e.g runner start at 01:00 PM every sunday and the parkour too
     public void initBackgroundService() {
         Map<String, MainConfig.MinigameSchedule> schedulers = mainConfig.getSchedulers();
 

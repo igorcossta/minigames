@@ -29,7 +29,7 @@ public class MainConfig extends ConfigLoader {
 
         ConfigurationSection section = getConfiguration().getConfigurationSection("schedulers");
         if (section == null) {
-            this.schedulers = Collections.emptyMap();
+            instance.getServer().getPluginManager().disablePlugin(instance);
             return;
         }
 
@@ -37,6 +37,7 @@ public class MainConfig extends ConfigLoader {
             String rawTime = section.getString(minigame + ".time");
             if (rawTime == null) {
                 instance.getLogger().warning("Missing 'time' entry for minigame scheduler: " + minigame);
+                instance.getServer().getPluginManager().disablePlugin(instance);
                 continue;
             }
 
@@ -46,6 +47,7 @@ public class MainConfig extends ConfigLoader {
                 String[] parts = scheduler.trim().split("-");
                 if (parts.length != 2) {
                     instance.getLogger().warning("Invalid scheduler format: " + scheduler + " for " + minigame);
+                    instance.getServer().getPluginManager().disablePlugin(instance);
                     continue;
                 }
 
@@ -57,6 +59,7 @@ public class MainConfig extends ConfigLoader {
                     daysAndTimes.add(dayAndTime);
                 } catch (Exception e) {
                     instance.getLogger().severe("Error parsing scheduler for " + minigame + ": " + e.getMessage());
+                    instance.getServer().getPluginManager().disablePlugin(instance);
                 }
             }
 
@@ -64,12 +67,37 @@ public class MainConfig extends ConfigLoader {
                 schedules.put(minigame, new MinigameSchedule(minigame, daysAndTimes));
             } catch (IllegalArgumentException e) {
                 instance.getLogger().severe("Invalid schedule for " + minigame + ": " + e.getMessage());
+                instance.getServer().getPluginManager().disablePlugin(instance);
             }
         }
 
-        this.schedulers = schedules;
+        try {
+            this.schedulers = checkIfTheresNoSameSchedule(schedules);
+        } catch (IllegalArgumentException e) {
+            instance.getLogger().severe("Scheduler validation failed: " + e.getMessage());
+            instance.getServer().getPluginManager().disablePlugin(instance);
+        }
     }
 
+    private Map<String, MinigameSchedule> checkIfTheresNoSameSchedule(Map<String, MinigameSchedule> schedulers) {
+        Map<DayAndTime, String> seen = new HashMap<>();
+
+        for (Map.Entry<String, MinigameSchedule> entry : schedulers.entrySet()) {
+            String minigame = entry.getKey();
+            List<DayAndTime> times = entry.getValue().times();
+
+            for (DayAndTime time : times) {
+                String existingMinigame = seen.putIfAbsent(time, minigame);
+                if (existingMinigame != null) {
+                    throw new IllegalArgumentException(
+                            "Conflict detected: %s and %s are scheduled at the same time (%s)"
+                                    .formatted(existingMinigame, minigame, time)
+                    );
+                }
+            }
+        }
+        return schedulers;
+    }
 
     public record MinigameSchedule(String minigameName, List<DayAndTime> times) {
         public MinigameSchedule {
