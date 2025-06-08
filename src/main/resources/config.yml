@@ -1,0 +1,7 @@
+schedulers:
+  #  runner:
+  #    time: monday-10:00AM, tuesday-11:00AM, wednesday-12:00PM, thursday-01:00PM, friday-02:00PM, saturday-03:00PM, sunday-04:00PM
+  runner:
+    time: monday-10:00AM, sunday-12:00PM
+  parkour:
+    time: monday-08:00AM, sunday-01:00PM
