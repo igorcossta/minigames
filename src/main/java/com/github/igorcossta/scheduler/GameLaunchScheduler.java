@@ -1,5 +1,6 @@
 package com.github.igorcossta.scheduler;
 
+import com.github.igorcossta.Minigames;
 import com.github.igorcossta.util.config.MainConfig;
 import com.github.igorcossta.util.time.DateTime;
 import org.jetbrains.annotations.NotNull;
@@ -38,6 +39,7 @@ public class GameLaunchScheduler {
             if (DateTime.isSameDay(currentTime.getDayOfWeek(), dayAndTime.getDayOfWeek())) {
                 if (DateTime.isSameTime(currentTime.toLocalTime(), dayAndTime.getTime())) {
                     System.out.println("The game %s is going to be started".formatted(minigameSchedule.minigameName()));
+                    Minigames.getMinigame(minigameSchedule.minigameName()).start();
                 }
             }
         };
