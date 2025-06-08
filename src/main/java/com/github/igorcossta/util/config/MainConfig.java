@@ -20,6 +20,10 @@ public class MainConfig extends ConfigLoader {
         return schedulers.get(minigame);
     }
 
+    public Map<String, MinigameSchedule> getSchedulers() {
+        return this.schedulers;
+    }
+
     public void registerSchedulers() {
         Map<String, MinigameSchedule> schedules = new HashMap<>();
 
